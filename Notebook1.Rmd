@@ -1,0 +1,25 @@
+---
+title: "R Markdown Documents - Part 1"
+subtitle: "Analysis of Environmental Data"
+author: "Liz Clark"
+output: 
+ html_document:
+  toc: true
+  toc_float: true
+  collapsed: false
+  smooth_scroll: false
+---
+
+# Introduction
+Hello, my name is **Liz Clark**
+I am in the *Environmental Conservation* program, and I study sea turtles!
+
+# Concepts List
+1. Getting less frustrated when working in R
+2. Learning more tips and tricks
+3. Becoming more confident in working with R
+
+# Course List
+* Analysis of Environmental Data (and Lab!)
+* Research Concepts
+* Research Topics in Environmental Conservation
