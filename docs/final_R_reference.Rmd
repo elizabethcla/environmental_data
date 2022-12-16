@@ -8,23 +8,192 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# R Reference Guide {.tabset .tabset-pills}
+<style>
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+    background-color: #269067;
+  }
+</style>
+## Loading Data and Packages
+```{r}
 
-## R Markdown
+# load new package, not already downloaded into R install.packages()
+#install.packages("new_package_name")
+#load new, downloaded package into environment for use library()
+#library("new_package_name")
+#can also use require() for the same thing as library()
+#require("new_package_name")
+#example
+require("palmerpenguins")
+library("palmerpenguins")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#load data using here(), "here" finds files within the directory your R project is currently in, you can specify files inside of other folders within the  directory using (here("file", "path")), use for downloading files from your computer into your R environment
+#require("here")
+#data_name = read.csv(here("folder", "name_of_file.csv"))
+##ginkgo dataset example
+require("here")
+ginkgo = read.csv(here("data", "ginkgo_data_2022.csv"))
+#now I have made a dataframe in my R environment containing all of the data within the ginkgo_data_2022.csv file
 
-```{r cars}
-summary(cars)
+
+#Create chunk = command+option+I
 ```
 
-## Including Plots
+## Data structures
+```{r}
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#The function c() combines or concatenates its arguments into a vector (a 1-dimensional data structure consisting of 1 or more elements).All of the elements must be of the same type.
+#I can’t combine character and numeric types in the same call to c()
+# Create a vector of numbers:
+num_vec  = c(1, 4, 8, 9, 13)
+# Create a vector of characters:
+char_vec = c("a", "fish", "data is cool")
+
+#usually use in loops, set length of vector, length()is used to get or set the length of a vector (list) or other objects.
+length(num_vec) ##prints "5" bc there are 5 values in num_vec
+
+#matrix() creates matrix from a given set of values
+mat= matrix(
+  c(1, 2, 3, 4, 5, 6, 7, 8, 9),      ##Taking sequence of elements
+  nrow = 3,                          ##No of rows of my matrix 
+  ncol = 3,                          ##No of columns of my matrix     
+  byrow = TRUE)                  ##By default matrices are in column-wise order
+                         ##So this parameter decides how to arrange the matrix
+print(mat)
+ 
+# length of matrix mat
+length(mat)
+
+#ginkgo example
+#A data frame is used for storing data tables. It is a list of vectors of equal length.
+ginkgo = read.csv(here("data", "ginkgo_data_2022.csv")) #"ginkgo is now a dataframe object
+#counts how many unique row variables(site ids) there are, which is 22
+nrow(ginkgo)
+#how many columns are in the ginkgo_df dataframe? 6
+ncol(ginkgo)
+#what are the dimentions of the who ginkgo dataframe? 220 rows and 6 columns
+dim(ginkgo)
+```
+## Subsetting
+```{r}
+
+ginkgo = read.csv(here("data", "ginkgo_data_2022.csv")) #"ginkgo is now a dataframe object
+#makes a dataframe of only site id values and seeds present values, $ selects the column you would like to subset from the dataset- data$column_name
+trees=(data.frame(ginkgo$site_id, ginkgo$seeds_present)) 
+
+#selecting using brackets []
+#select first row of the ginkgo data
+ginkgo[1,]
+#select the element in row 2, column 3
+ginkgo[2,3]
+#select the 3rd column of the ginkgo data
+ginkgo[,3]
+
+#subset() how to only get info for Adelie penguins
+require("palmerpenguins")
+# == means I only want species adelie from the penguins dataset. If i had put != that would mean i want all species except adelie from the penguins dataset
+adelie = droplevels(subset(penguins, species == "Adelie"))
+```
+## Numerical Data Exploration
+```{r}
+
+
+#load data
+require("here")
+ginkgo = read.csv(here("data", "ginkgo_data_2022.csv")) #"ginkgo is now a dataframe object
+
+#look at data using summary()
+#prints summary of values(min, median, mean, max, 1st, 2nd, 3rd quartile) for each column of data ex: site_id, seeds_present, max_width, max_depth, notch_depth, petiole_length
+summary(ginkgo)
+
+#find the mean value of a specific column of values(petiole_length) in the dataframe(ginkgo) using mean().... na.rm=TRUE means remove NA values
+mean((ginkgo$petiole_length), na.rm=TRUE)
+
+#find the standard deviation of a specific column of values(petiole_length) in the dataframe(ginkgo) using sd().... na.rm=TRUE means remove NA values
+sd((ginkgo$petiole_length), na.rm=TRUE)
+
+```
+## Graphical Data Exploration
+```{r}
+
+#plot()= scatterplot, #col= color, pch= point shape, cex=number indicating the amount by which plotting text and symbols , main= title, xlab= x axis label, ylab= y axis label, xlim= range of x values, ylim= range of y values
+plot(ginkgo$max_depth, 
+  ginkgo$max_width,
+  col= c("blue","green"),
+  pch= c(8, 11), 
+  cex=1, 
+  main= "Liz's Ginkgo Maximum Petal Size Plot", 
+  xlab="Maximum Petal Depth", 
+  ylab="Maximum Petal Width", 
+  xlim= c(0,150), 
+  ylim=c(0,150))
+
+#create histogram, use hist(), breaks= the number of histogram bars  
+require("palmerpenguins")
+library("palmerpenguins")
+flip= penguins$flipper_length_mm
+hist(flip, breaks=7, xlab="flipper length (mm)")
+
+#simple boxplot()
+require("here")
+ginkgo = read.csv(here("data", "ginkgo_data_2022.csv")) #"ginkgo is now a dataframe object
+pet= ginkgo$petiole_length
+boxplot(pet, ylab="petiole length", main="Ginkgo Petiole Length")
+#conditional boxplot
+boxplot(
+ petiole_length~seeds_present,
+  data = ginkgo,
+  main = "petiole length and seed data")
+#quad histogram par(mfrow=c()) makes dimentions of plot viewer
+pet= ginkgo$petiole_length
+width= ginkgo$max_width
+notch=ginkgo$notch_depth
+depth= ginkgo$max_depth
+par(mfrow=c(2,2))
+hist(pet)
+hist(width)
+hist(notch)
+hist(depth)
+
+
+```
+## Distribution Functions
+```{r}
+
+
+#dnorm() is the normal density, probability density function. calculate the density function with mean mu and standard deviation for any value of x, mu, and sd.
+#pnorm() normal distribution, cumulative distribution function
+#example mean weight of a giant peach is 1000g and std dev is 10g
+Mean <- 1000
+Sd <- 10
+# X grid for non-standard normal distribution
+x <- seq(-3, 3, length = 100) * Sd + Mean 
+# dnorm Density function
+f <- dnorm(x, Mean, Sd)
+plot(x, f, type = "l", lwd = 2, col = "blue", ylab = "", xlab = "Weight")
+#Vertical line on the mean
+abline(v = Mean) 
+
+#whats the probability of a giant peach weighing less than 1010 grams 
+pnorm(1010, Mean, Sd) 
+#qnorm() quantile function of the normal distribution
+#quantile for probability 0.5 (Q(0.5)Q(0.5)) on a symmetric distribution is equal to the mean
+qnorm(0.5, mean = 0, sd = 1)
+
+#dbinom()  returns the value of the probability density function (pdf) of the binomial distribution given a certain random variable x, number of trials (size) and probability of success on each trial (prob). The syntax for using dbinom is dbinom(x, size, prob) 
+#example a frog catches its prey 60% of the time. If the frog attempts so catch prey 12 times what is the probability that it is successful 10 times?
+dbinom(x=10, size=12, prob=.6)
+
+#pbinom()eturns the value of the cumulative density function (cdf) of the binomial distribution given a certain random variable q, number of trials (size) and probability of success on each trial (prob). The syntax for using pbinom is  pbinom(q, size, prob) 
+#example a frog has a 50 percent chance of catching its prey. Whats the probibility that it is sucessful more than 2 times?
+pbinom(2, size=5, prob=.5, lower.tail=FALSE)
+
+#qbinom() returns the value of the inverse cumulative density function (cdf) of the binomial distribution given a certain random variable q, number of trials (size) and probability of success on each trial (prob). The syntax for using qbinom is qbinom(q, size, prob) 
+#example
+#find the 10th quantile of a binomial distribution with 10 trials and prob of success on each trial = 0.4
+qbinom(.10, size=10, prob=.4)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+

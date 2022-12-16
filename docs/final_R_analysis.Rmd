@@ -1,0 +1,126 @@
+---
+title: "final_analysis"
+author: "Liz Clark"
+date: "2022-12-15"
+output: html_document
+---
+
+
+
+# Part 2: Data Analysis
+<style>
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+    background-color: #269067;
+  }
+</style>
+## Numerical exploration
+```{r}
+require("here")
+delomys = read.csv(here("data", "delomys.csv"))
+summary(delomys$body_mass)
+
+summary(delomys$body_length)
+
+shapiro.test(delomys$body_mass)
+
+shapiro.test(delomys$body_length)
+
+```
+## Graphical exploration
+```{r fig.width=10}
+require(palmerpenguins)
+plot(bill_length_mm ~ body_mass_g, data = penguins)
+```
+##A scatterplot of body mass and body length
+```{r fig.width=5}
+plot(body_mass ~ body_length, data = delomys)
+```
+##A histogram of body mass
+```{r fig.width=5}
+boxplot(delomys$body_mass)
+```
+##A histogram of body length
+```{r fig.width=5}
+hist(delomys$body_length)
+```
+##A conditional boxplot of body mass, conditioned on species (column binomial)
+```{r fig.width=10}
+boxplot(formula= body_mass ~binomial,
+        data= delomys)
+```
+##A conditional boxplot of body mass, conditioned on sex (column sex)
+```{r fig.width=10}
+boxplot(formula= body_mass ~sex,
+        data= delomys)
+```
+##A conditional boxplot of body mass, conditioned on both species and sex
+
+```{r fig.width=10}
+boxplot(formula= body_mass ~binomial:sex,
+        data= delomys)
+```
+
+## Model 1: simple linear regression body_length ~ body_mass
+```{r}
+fit1=lm(body_length ~ body_mass, data = delomys)
+summary(fit1)
+shapiro.test(fit1$residuals)
+hist(residuals(fit1))
+
+knitr::kable(coef(summary(fit1)),digits = 4)
+knitr::kable(anova(fit1),digits = 4)
+```
+## Model 2: 1-way ANOVA body_mass ~ sex
+```{r}
+fit2=lm(body_mass ~ sex, data = delomys)
+summary(fit2)
+anova(fit2)
+shapiro.test(fit2$residuals)
+hist(residuals(fit2))
+
+knitr::kable(coef(summary(fit2)),digits = 4)
+knitr::kable(anova(fit2),digits = 4)
+```
+## Model 3: 1-way ANOVA body_mass ~ binomial
+```{r}
+fit3=lm(body_mass ~ binomial, data = delomys)
+summary(fit3)
+anova(fit3)
+hist(residuals(fit3))
+shapiro.test(fit3$residuals)
+knitr::kable(coef(summary(fit3)),digits = 4)
+knitr::kable(anova(fit3),digits = 4)
+```
+## Model 4: 2-way additive ANOVA body_mass ~ sex + binomial
+```{r}
+fit4=lm(body_mass ~ sex+binomial, data = delomys)
+summary(fit4)
+anova(fit4)
+
+hist(residuals(fit4))
+shapiro.test(fit4$residuals)
+knitr::kable(coef(summary(fit4)),digits = 4)
+knitr::kable(anova(fit4),digits = 4)
+```
+## Model 5: 2-way factorial ANOVA body_mass ~ sex * binomial
+```{r}
+fit5=lm(body_mass ~ sex*binomial, data = delomys)
+summary(fit5)
+anova(fit5)
+
+hist(residuals(fit5))
+shapiro.test(fit5$residuals)
+knitr::kable(coef(summary(fit5)),digits = 4)
+knitr::kable(anova(fit5),digits = 4)
+```
+## AIC model comparison
+```{r}
+
+AIC(
+  fit1,
+  fit2,
+  fit3,
+  fit4,
+  fit5)
+
+```
